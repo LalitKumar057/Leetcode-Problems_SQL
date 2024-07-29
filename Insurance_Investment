@@ -1,0 +1,29 @@
+Write a solution to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:
+
+have the same tiv_2015 value as one or more other policyholders, and
+are not located in the same city as any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).
+
+
+--create table insurance
+--(pid int , tiv_2015 int ,tiv_2016 int , lon int , lat int);
+--
+--insert into insurance
+--values
+--(1,10,5,10,10),
+--(2,20,20,20,20),
+--(3,10,30,20,20),
+--(4,10,40,40,40); 
+
+
+with cte as (select *, concat(lon,lat) as loc from insurance),
+
+final_query as	
+(select * from cte
+where tiv_2015 in (select tiv_2015  from insurance
+	group by tiv_2015
+	having count(1) > 1)  and
+
+loc in (select loc from cte
+	group by loc
+	having count(loc) = 1))
+select sum(tiv_2016) from final_query
